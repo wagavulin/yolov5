@@ -10,9 +10,9 @@ import cv2
 in_json_path = "../dhd_traffic/annotations/dhd_traffic_train.json"
 out_dir_top = "../drive/MyDrive/peddet/ped-yolov5"
 
-num_train = 80
-num_val = 20
-num_test = 20
+num_train = 1600
+num_val = 400
+num_test = 400
 
 num_total = num_train + num_val + num_test
 eqhist = True
@@ -58,7 +58,7 @@ for image_id, image in images_dict.items():
 ex_images = [] # extracted images
 num_extracted = 0
 for i, image in enumerate(images):
-    if i % 5 == 0:
+    if True:#i % 5 == 0:
         contains_pedestrian = False
         for annotation in image.annotations:
             if annotation["category_id"] == 1:
