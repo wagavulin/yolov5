@@ -15,7 +15,8 @@ num_val = 20
 num_test = 20
 
 num_total = num_train + num_val + num_test
-eqhist = False
+eqhist = True
+denoising = True
 mark_label = False
 scale = False
 
@@ -136,15 +137,21 @@ for i, image in enumerate(ex_images):
         txt_dst_path = out_dir_test_label + "/" + txt_fname
     else:
         break
-    #img = cv2.imread(src_path)
-    # if eqhist:
-    #     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    #     lab_planes = cv2.split(lab)
-    #     lab_planes[0] = clahe.apply(lab_planes[0])
-    #     lab = cv2.merge(lab_planes)
-    #     img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
-    shutil.copy2(src_path, img_dst_path)
+    if eqhist or denoising:
+        img = cv2.imread(src_path)
+        if eqhist:
+            lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+            lab_planes = cv2.split(lab)
+            lab_planes[0] = clahe.apply(lab_planes[0])
+            lab = cv2.merge(lab_planes)
+            img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
+        if denoising:
+            img = cv2.fastNlMeansDenoisingColored(img,None,10,10,7,21)
+        cv2.imwrite(img_dst_path, img)
+    else:
+        shutil.copy2(src_path, img_dst_path)
+
     with open(txt_dst_path, "w") as fout:
         for annotation in image.annotations:
             cat_id = annotation["category_id"] # 1: ped, 2: cyc, 3: car, 4: truck, 5: van
