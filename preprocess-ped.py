@@ -29,6 +29,8 @@ class Image:
 
 dat = json.load(open(in_json_path))
 
+categories = [d["name"] for d in dat["categories"]]
+
 # Create dictionary of image_id -> file_name
 imgid2fname_dict = {}
 for image in dat["images"]:
@@ -155,14 +157,15 @@ for i, image in enumerate(ex_images):
     with open(txt_dst_path, "w") as fout:
         for annotation in image.annotations:
             cat_id = annotation["category_id"] # 1: ped, 2: cyc, 3: car, 4: truck, 5: van
-            if cat_id == 1:
+            if True:#cat_id == 1:
                 rbb = annotation["rel_bbox"]
                 fout.write("%d %f %f %f %f\n" % (cat_id-1, rbb[0], rbb[1], rbb[2], rbb[3]))
 
 yaml_path = out_dir_top + "/data.yaml"
+categories_with_quote = ["'"+cat+"'" for cat in categories]
 with open(yaml_path, "w") as f:
     f.write("train: " + out_dir_top + "/train/images\n")
     f.write("val: "   + out_dir_top + "/valid/images\n")
     f.write("\n")
-    f.write("nc: 1\n")
-    f.write("names: ['mypedestrian']\n")
+    f.write("nc: %d\n" % len(categories))
+    f.write("names: [" + ",".join(categories_with_quote) + "]\n")
